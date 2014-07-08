@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="plagiarism/ephorus/db" VERSION="20130410" COMMENT="XMLDB file for Moodle 2.4 Ephorus Plagiarism Plugin"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
+	<TABLES>
+		<TABLE NAME="plagiarism_eph_assignment" COMMENT="Defines the processtype per assignment." NEXT="plagiarism_eph_document">
+			<FIELDS>
+				<FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="assignment"/>
+				<FIELD NAME="assignment" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="processtype"/>
+				<FIELD NAME="processtype" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="assignment"/>
+			</FIELDS>
+			<KEYS>
+				<KEY NAME="primary" TYPE="primary" FIELDS="id" />
+			</KEYS>
+		</TABLE>
+		<TABLE NAME="plagiarism_eph_document" COMMENT="Defines ephorus files and saves the report with summary" PREVIOUS="plagiarism_eph_assignment" NEXT="plagiarism_eph_result">
+			<FIELDS>
+				<FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="guid"/>
+				<FIELD NAME="guid" TYPE="char" LENGTH="36" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="fileid"/>
+				<FIELD NAME="fileid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="guid" NEXT="filename"/>
+				<FIELD NAME="filename" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="fileid" NEXT="contenthash"/>
+				<FIELD NAME="contenthash" TYPE="char" LENGTH="55" NOTNULL="true" SEQUENCE="false" PREVIOUS="filename" NEXT="student_name"/>
+				<FIELD NAME="student_name" TYPE="char" LENGTH="60" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="contenthash" NEXT="student_number"/>
+				<FIELD NAME="student_number" TYPE="char" LENGTH="25" NOTNULL="true" SEQUENCE="false" PREVIOUS="student_name" NEXT="date_created"/>
+				<FIELD NAME="date_created" TYPE="char" LENGTH="25" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="student_number" NEXT="percentage"/>
+				<FIELD NAME="percentage" TYPE="int" LENGTH="3" NOTNULL="false" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="date_created" NEXT="duplicate_guid"/>
+				<FIELD NAME="duplicate_guid" TYPE="char" LENGTH="36" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="percentage" NEXT="duplicate_student_name"/>
+				<FIELD NAME="duplicate_student_name" TYPE="char" LENGTH="60" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="duplicate_guid" NEXT="duplicate_student_number"/>
+				<FIELD NAME="duplicate_student_number" TYPE="char" LENGTH="25" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="duplicate_student_name" NEXT="status"/>
+				<FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="duplicate_student_number" NEXT="error"/>
+				<FIELD NAME="error" TYPE="char" LENGTH="30" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="status" NEXT="summary"/>
+				<FIELD NAME="summary" TYPE="text" LENGTH="big" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="error" NEXT="compressed"/>
+				<FIELD NAME="compressed" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="summary" NEXT="visible"/>
+				<FIELD NAME="visible" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" PREVIOUS="compressed" NEXT="processtype"/>
+				<FIELD NAME="processtype" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="false" DEFAULT="1" SEQUENCE="false" PREVIOUS="visible" NEXT="submission"/>
+				<FIELD NAME="submission" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="processtype"/>
+			</FIELDS>
+			<KEYS>
+				<KEY NAME="primary" TYPE="primary" FIELDS="id" />
+			</KEYS>
+			<INDEXES>
+				<INDEX NAME="guid" UNIQUE="false" FIELDS="guid" NEXT="fileid"/>
+				<INDEX NAME="fileid" UNIQUE="false" FIELDS="fileid" PREVIOUS="guid"/>
+			</INDEXES>
+		</TABLE>
+		<TABLE NAME="plagiarism_eph_result" COMMENT="Defines ephorus results and save the detailed report per record." PREVIOUS="plagiarism_eph_document">
+			<FIELDS>
+				<FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="guid"/>
+				<FIELD NAME="guid" TYPE="char" LENGTH="36" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="document_guid"/>
+				<FIELD NAME="document_guid" TYPE="char" LENGTH="36" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="guid" NEXT="original_guid"/>
+				<FIELD NAME="original_guid" TYPE="char" LENGTH="36" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="document_guid" NEXT="url"/>
+				<FIELD NAME="url" TYPE="text" LENGTH="medium" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="original_guid" NEXT="type"/>
+				<FIELD NAME="type" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" PREVIOUS="url" NEXT="percentage"/>
+				<FIELD NAME="percentage" TYPE="int" LENGTH="3" NOTNULL="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="type" NEXT="comparison"/>
+				<FIELD NAME="comparison" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" PREVIOUS="percentage" NEXT="compressed"/>
+				<FIELD NAME="compressed" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="comparison" NEXT="student_name"/>
+				<FIELD NAME="student_name" TYPE="char" LENGTH="60" NOTNULL="false" SEQUENCE="false" PREVIOUS="compressed" NEXT="student_number"/>
+				<FIELD NAME="student_number" TYPE="char" LENGTH="25" NOTNULL="false" SEQUENCE="false" PREVIOUS="student_name"/>
+			</FIELDS>
+			<KEYS>
+				<KEY NAME="primary" TYPE="primary" FIELDS="id" />
+			</KEYS>
+			<INDEXES>
+				<INDEX NAME="document_guid" UNIQUE="false" FIELDS="document_guid"/>
+			</INDEXES>
+		</TABLE>
+	</TABLES>
+</XMLDB>

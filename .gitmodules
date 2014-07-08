@@ -1,0 +1,3 @@
+[submodule "include/comms"]
+	path = include/comms
+	url = git@github.com:gerkekok/ephorus-comms.git

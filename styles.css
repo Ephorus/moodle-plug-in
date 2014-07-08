@@ -1,0 +1,51 @@
+.ModeSelection {
+	text-align: right;
+	margin-bottom: 6px;
+}
+
+.ModeSelection a:link, .ModeSelection a:visited, .summary_removed {
+	color: #09f !important;
+}
+
+.ephorus table a:link, .ephorus table a:visited, .summary_found {
+	color: #f90 !important;
+}
+
+.summary_added, .summary_original {
+	color: #222 !important;
+}
+
+.ephorus table { margin-bottom: 20px; }
+
+.ephorus th { background-color: #f2f2f2; text-align: left; }
+
+.ephorus td, .ephorus th { border: 1px solid #d3d3d3; padding: 4px 6px !important; border-width: 1px !important; }
+
+.ephorus h3 { color: #222; font-size: 13px !important; line-height: 18px !important; }
+
+.ephReport {
+	padding: 6px;
+	border: 1px solid #d3d3d3;
+}
+
+.result_original, .result_found {
+	width: 50%;
+	word-wrap: break-word;
+}
+.result_original > div {
+	color: #f90;
+	margin-right: 3px;
+}
+
+.result_found > div {
+	color: #222;
+	margin-left: 3px;
+}
+
+#id_handin_code {
+	width: 75%;
+}
+
+#id_handin_address, #id_index_address {
+	width: 100%;
+}
