@@ -226,7 +226,7 @@ class plagiarism_plugin_ephorus extends plagiarism_plugin {
                 $DB->insert_record('plagiarism_eph_assignment', $record);
             }
         } else {
-            if ($plagiarism_ephorus_assignment) {
+            if ($ephorus_assignment) {
                 $DB->delete_records('plagiarism_eph_assignment', array('id' => $ephorus_assignment));
             }
         }
