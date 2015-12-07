@@ -288,7 +288,7 @@ class plagiarism_plugin_ephorus extends plagiarism_plugin {
                     $ephorus_service->visibilityService($document->guid, $ephorus_service::INVISIBLE);
                 }
             }
-            
+
             mtrace('Starting handinscript Ephorus');
             require_once($CFG->dirroot.'/plagiarism/ephorus/include/comms/handinservice.php');
             mtrace('Finished handinscript Ephorus');
@@ -357,6 +357,13 @@ class plagiarism_plugin_ephorus extends plagiarism_plugin {
                     } else {
                         $user = $DB->get_record('user', array('id' => $eventdata->userid));
                         $submission = $DB->get_record('assign_submission', array('id' => $eventdata->itemid));
+
+                        // Check if submission drafts are on and set draft if need be.
+                        $submissiondrafts = $DB->get_record('assign', array('id' => $submission->assignment), 'submissiondrafts');
+                        if ($submissiondrafts) {
+                            $submission->status = "draft";
+                        }
+
                         $result = plagiarism_ephorus_create_file($file, $user, $processtype, $submission);
                     }
                     // Check to see if all ephorus documents exist
