@@ -57,7 +57,7 @@ class plagiarism_plugin_ephorus extends plagiarism_plugin {
             !$DB->record_exists_sql($sql, array($linkarray['cmid'])) || //
             !isset($linkarray['file']) || //
             $file_component !== 'assignsubmission_file') {
-            return '<br />';
+            return '';
         }
 
         $return = '<p>'.get_string('ephorus_status', 'plagiarism_ephorus').': ';
