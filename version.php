@@ -26,7 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015120700;
+$plugin->version   = 2016102101;
 $plugin->requires  = 2013101800;
 $plugin->cron      = 0;
 $plugin->component = 'plagiarism_ephorus';
