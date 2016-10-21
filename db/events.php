@@ -15,32 +15,31 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /*
-* Event Handlers
+* Observers
 */
-$handlers = array (
-    'assessable_file_uploaded' => array (
-        'handlerfile'      => '/plagiarism/ephorus/lib.php',
-        'handlerfunction'  => 'plagiarism_ephorus_event_file_uploaded',
-        'schedule'         => 'instant'
+$observers = array (
+    array(
+        'eventname' => '\assignsubmission_file\event\assessable_uploaded',
+        'callback'  => 'plagiarism_ephorus_observer::assignsubmission_file_uploaded'
     ),
-    'assessable_files_done' => array (
-        'handlerfile'      => '/plagiarism/ephorus/lib.php',
-        'handlerfunction'  => 'plagiarism_ephorus_event_files_done',
-        'schedule'         => 'instant'
+    array(
+        'eventname' => '\assignsubmission_onlinetext\event\assessable_uploaded',
+        'callback'  => 'plagiarism_ephorus_observer::assignsubmission_onlinetext_uploaded'
     ),
-    'mod_created' => array (
-        'handlerfile'      => '/plagiarism/ephorus/lib.php',
-        'handlerfunction'  => 'plagiarism_ephorus_event_mod_created',
-        'schedule'         => 'instant'
+    array(
+        'eventname' => '\mod_assign\event\assessable_submitted',
+        'callback'  => 'plagiarism_ephorus_observer::assignsubmission_submitted'
     ),
-    'mod_updated' => array (
-        'handlerfile'      => '/plagiarism/ephorus/lib.php',
-        'handlerfunction'  => 'plagiarism_ephorus_event_mod_updated',
-        'schedule'         => 'instant'
+    array(
+        'eventname' => '\core\event\course_module_created',
+        'callback'  => 'plagiarism_ephorus_observer::course_module_created'
     ),
-    'mod_deleted' => array (
-        'handlerfile'      => '/plagiarism/ephorus/lib.php',
-        'handlerfunction'  => 'plagiarism_ephorus_event_mod_deleted',
-        'schedule'         => 'instant'
+    array(
+        'eventname' => '\core\event\course_module_updated',
+        'callback'  => 'plagiarism_ephorus_observer::course_module_updated'
     ),
+    array(
+        'eventname' => '\core\event\course_module_deleted',
+        'callback'  => 'plagiarism_ephorus_observer::course_module_deleted'
+    )
 );
