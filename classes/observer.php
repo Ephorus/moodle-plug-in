@@ -83,6 +83,6 @@ class plagiarism_ephorus_observer {
 	public static function course_module_deleted(
         \core\event\course_module_deleted $event) {
 		global $DB;
-        $DB->delete_records('plagiarism_eph_assignment', array('id' => $ephorus_assignment));
+        $DB->delete_records('plagiarism_eph_assignment', array('assignment' => $eventdata['contextinstanceid']));
 	}
 }
