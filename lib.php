@@ -47,7 +47,7 @@ class plagiarism_plugin_ephorus extends plagiarism_plugin {
         $action = optional_param('action', '', PARAM_ACTION);
         $accepted_actions = array('grading', 'submitgrade', 'viewpluginassignsubmission');
 
-        $sql = 'SELECT ea.id FROM {plagiarism_eph_assignment} ea 
+        $sql = 'SELECT ea.id FROM {plagiarism_eph_assignment} ea
                 LEFT JOIN {course_modules} cm ON cm.instance = ea.assignment
                 WHERE cm.id = ?';
 
@@ -306,24 +306,23 @@ class plagiarism_plugin_ephorus extends plagiarism_plugin {
         require_once($CFG->dirroot.'/plagiarism/ephorus/include/comms/class.EphorusApi.php');
 
         $result = true;
-        $cmid = (!empty($eventdata->cm->id)) ? $eventdata->cm->id : $eventdata->cmid;
 
-        if ($eventdata->eventtype == 'file_uploaded' && (isset($eventdata->files) || !empty($eventdata->file))) {
+        $cmid = $eventdata['contextinstanceid'];
+
+        // Get the file path name hashes.
+        if (isset($eventdata['other']['pathnamehashes']) || !empty($eventdata['other']['pathnamehashes'])) {
+            $filepathnamehashes = $eventdata['other']['pathnamehashes'];
+        }
+
+        if ($eventdata['eventtype'] == 'file_uploaded' && isset($filepathnamehashes)) {
             $sql = 'SELECT ea.processtype FROM {course_modules} cm
                     LEFT JOIN {plagiarism_eph_assignment} ea ON ea.assignment = cm.instance
                     WHERE cm.id = ?';
-            $processtype = $DB->get_field_sql($sql, array($cmid));
+            $processtype = $DB->get_field_sql($sql, array($eventdata['contextinstanceid']));
             if ($processtype && $processtype > 0) {
-                // In Single File Upload the file is stored in a different file.
-                if (!empty($eventdata->file) && empty($eventdata->files)) {
-                    // Add to (just created) array for file handling.
-                    if (is_array($eventdata->file)) {
-                        $keys = array_keys($eventdata->file);
-                        $file = $eventdata->file[$keys[0]];
-                    }
-                    $eventdata->files[] = isset($file)?$file:$eventdata->file;
-                }
-                foreach ($eventdata->files as $file) {
+                $fs = get_file_storage();
+                foreach ($filepathnamehashes as $filepathnamehash) {
+                    $file = $fs->get_file_by_hash($filepathnamehash);
                     if ($file->get_filename() === '.') {
                         continue;
                     }
@@ -332,7 +331,7 @@ class plagiarism_plugin_ephorus extends plagiarism_plugin {
                             LEFT JOIN {files} f ON f.id = ed.fileid
                             LEFT JOIN {assign_submission} s ON s.id = f.itemid
                             WHERE f.timecreated = ? AND ed.submission = ?';
-                    if ($document = $DB->get_record_sql($sql, array($file->get_timecreated(), $eventdata->itemid))) {
+                    if ($document = $DB->get_record_sql($sql, array($file->get_timecreated(), $eventdata['objectid']))) {
                         $record = new stdClass();
                         $record->id = $document->id;
                         $record->visible = $document->visible;
@@ -355,8 +354,8 @@ class plagiarism_plugin_ephorus extends plagiarism_plugin {
                         }
                         $result = $DB->update_record('plagiarism_eph_document', $record);
                     } else {
-                        $user = $DB->get_record('user', array('id' => $eventdata->userid));
-                        $submission = $DB->get_record('assign_submission', array('id' => $eventdata->itemid));
+                        $user = $DB->get_record('user', array('id' => $eventdata['userid']));
+                        $submission = $DB->get_record('assign_submission', array('id' => $eventdata['objectid']));
 
                         // Check if submission drafts are on and set draft if need be.
                         $submissiondrafts = $DB->get_record('assign', array('id' => $submission->assignment), 'submissiondrafts');
@@ -370,7 +369,7 @@ class plagiarism_plugin_ephorus extends plagiarism_plugin {
                     $sql = "SELECT ed.id, ed.guid, ed.visible, f.filename FROM {plagiarism_eph_document} ed
                             LEFT JOIN {files} f ON f.id = ed.fileid
                             WHERE ed.submission  = ? AND f.filename IS NULL";
-                    $documents = $DB->get_records_sql($sql, array($eventdata->itemid));
+                    $documents = $DB->get_records_sql($sql, array($eventdata['objectid']));
                     include_once(dirname(__FILE__).'/include/comms/class.EphorusApi.php');
                     $ephorus_service = new EphorusService();
                     foreach($documents as $document) {
@@ -382,8 +381,8 @@ class plagiarism_plugin_ephorus extends plagiarism_plugin {
                     }
                 }
             }
-        } else if ($eventdata->eventtype == 'files_done') {
-            if ($documents = $DB->get_records('plagiarism_eph_document', array('submission' => $eventdata->itemid, 'status' => '-1'))) {
+        } else if ($eventdata['eventtype'] == 'files_done') {
+            if ($documents = $DB->get_records('plagiarism_eph_document', array('submission' => $eventdata['objectid'], 'status' => '-1'))) {
                 foreach ($documents as $document) {
                     $DB->set_field('plagiarism_eph_document', 'status', '0', array('id' => $document->id));
                 }
@@ -391,40 +390,6 @@ class plagiarism_plugin_ephorus extends plagiarism_plugin {
         }
         return $result;
     }
-}
-/**
- * functions for calling the event_handler function
- *
- * @param object $eventdata - full Event object
- */
-function plagiarism_ephorus_event_file_uploaded($eventdata) {
-    $eventdata->eventtype = 'file_uploaded';
-    $ephorus = new plagiarism_plugin_ephorus();
-    return $ephorus->event_handler($eventdata);
-}
-
-function plagiarism_ephorus_event_files_done($eventdata) {
-    $eventdata->eventtype = 'files_done';
-    $ephorus = new plagiarism_plugin_ephorus();
-    return $ephorus->event_handler($eventdata);
-}
-
-function plagiarism_ephorus_event_mod_created($eventdata) {
-    $eventdata->eventtype = 'mod_created';
-    $ephorus = new plagiarism_plugin_ephorus();
-    return $ephorus->event_handler($eventdata);
-}
-
-function plagiarism_ephorus_event_mod_updated($eventdata) {
-    $eventdata->eventtype = 'mod_updated';
-    $ephorus = new plagiarism_plugin_ephorus();
-    return $ephorus->event_handler($eventdata);
-}
-
-function plagiarism_ephorus_event_mod_deleted($eventdata) {
-    $eventdata->eventtype = 'mod_deleted';
-    $ephorus = new plagiarism_plugin_ephorus();
-    return $ephorus->event_handler($eventdata);
 }
 /**
  * function for creating files in the ephorus table
