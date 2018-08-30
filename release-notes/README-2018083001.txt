@@ -1,0 +1,12 @@
+Release notes for v2018083001
+Ephorus plugin is GDPR compliant!
+
+To support upcoming changes to European data protection law, we’ve focused our efforts on refreshing our processes around how we use your data. Learn more about the update via our Moodle Plugins and GDPR page. https://guides.turnitin.com/03_Integrations/Turnitin_Partner_Integrations/Moodle/Moodle_Plugins_and_GDPR
+
+Repository settings are more transparent
+We're reporting on the data we store about our users
+Students can request to download their data
+Students can request to remove their data
+
+If you're a Moodle administrator, and using version 3.3.5+, 3.4.2+, or 3.5, follow the steps on the Moodle Plugins and GDPR page to view the data we store in Moodle.
+https://guides.turnitin.com/03_Integrations/Turnitin_Partner_Integrations/Moodle/Moodle_Plugins_and_GDPR
