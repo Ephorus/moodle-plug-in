@@ -140,19 +140,11 @@ class provider implements
 
         $params = ['userid' => $user->id];
 
-        $sql = "SELECT 
-                id,
-                guid, 
-                filename,
-                contenthash,
-                student_name,
-                student_number,
-                date_created,
-                percentage,
-                summary,
-                submission
-                FROM {plagiarism_eph_document}
-                WHERE student_number = :userid";
+        $sql = "SELECT ed.id, ed.guid, ed.filename, ed.contenthash, ed.student_name, ed.student_number, 
+                ed.date_created, ed.percentage, ed.summary, ed.submission
+                FROM {plagiarism_eph_document} ed
+                LEFT JOIN {files} f ON ed.fileid = f.id 
+                WHERE f.userid = :userid";
         $submissions = $DB->get_records_sql($sql, $params);
 
         foreach ($submissions as $submission) {
