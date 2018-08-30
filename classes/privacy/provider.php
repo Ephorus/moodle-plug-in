@@ -67,7 +67,7 @@ class provider implements
                 'submission' => 'privacy:metadata:plagiarism_eph_document:submission'
             ],
             'privacy:metadata:plagiarism_eph_document'
-        );   
+        );
 
         $collection->add_database_table(
             'plagiarism_eph_result',
@@ -141,21 +141,28 @@ class provider implements
         $params = ['userid' => $user->id];
 
         $sql = "SELECT 
-                'guid', 
-                'filename',
-                'contenthash',
-                'student_name',
-                'student_number',
-                'date_created',
-                'percentage',
-                'summary',
-                'submission'
+                id,
+                guid, 
+                filename,
+                contenthash,
+                student_name,
+                student_number,
+                date_created,
+                percentage,
+                summary,
+                submission
                 FROM {plagiarism_eph_document}
                 WHERE student_number = :userid";
         $submissions = $DB->get_records_sql($sql, $params);
 
         foreach ($submissions as $submission) {
-            $context = \context_module::instance($submission->cm);
+            $cm = $DB->get_record_sql("SELECT cm.* FROM {course_modules} cm
+            LEFT JOIN {modules} modu ON modu.id = cm.module
+            LEFT JOIN {assign_submission} sub ON sub.assignment = cm.instance
+            LEFT JOIN {plagiarism_eph_document} ed ON ed.submission = sub.id 
+            WHERE modu.name = 'assign' AND ed.guid = ? AND ed.submission = ?", array($submission->guid, $submission->submission));
+
+            $context = \context_module::instance($cm->id);
             self::_export_plagiarism_ephorus_data_for_user((array)$submission, $context, $user);
         }
     }
