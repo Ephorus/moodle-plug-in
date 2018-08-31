@@ -25,7 +25,7 @@ class EphorusService {
 	 *
 	 * @param bool $logging - overrule function for logging
 	 */
-	function EphorusService($logging = true) {
+	function __construct($logging = true) {
 		DLEApi::initialize();
 
 		if($logging) {
@@ -331,7 +331,7 @@ class EphorusReport {
 	/**
 	 * Constructor
 	 */
-	public function EphorusReport($document_guid, $mode = 'summary') {
+	public function __construct($document_guid, $mode = 'summary') {
 		$this->document_guid = $document_guid;
 		$this->mode = $mode;
 	}
@@ -494,7 +494,7 @@ class EphorusStatus {
 	/**
 	 * Constructor
 	 */
-	public function EphorusStatus() {
+	public function __construct() {
 		DLEApi::initialize();
 	}
 
